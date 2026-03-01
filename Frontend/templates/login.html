@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - MediCare+</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .login-container { display: flex; align-items: center; justify-content: center; min-height: 80vh; }
+        .login-card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.15); width: 100%; max-width: 450px; }
+        .login-card h2 { color: #667eea; margin-bottom: 25px; text-align: center; font-weight: 700; }
+        .form-group { margin-bottom: 20px; }
+        .form-control { padding: 12px; border-radius: 10px; border: 1px solid #ddd; }
+        .btn-login { width: 100%; padding: 12px; font-size: 16px; }
+        .links { text-align: center; margin-top: 20px; font-size: 14px; }
+        .alert { padding: 10px 15px; border-radius: 8px; }
+    </style>
+</head>
+<body>
+<div class="login-container">
+    <div class="login-card">
+        <h2>MediCare+ Login</h2>
+        <div id="alert-container"></div>
+        <form action="/login" method="post">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" class="form-control" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" class="form-control" id="password" name="password" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-login">Login</button>
+        </form>
+        <div class="links">
+            <p>New to MediCare+? <a href="/register">Register as a Customer</a></p>
+            <p>Want to sell with us? <a href="/seller/registration">Register as a Seller</a></p>
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const params = new URLSearchParams(window.location.search);
+        const alertContainer = document.getElementById('alert-container');
+        if (params.has('error')) {
+            alertContainer.innerHTML = '<div class="alert alert-danger">Invalid username or password.</div>';
+        } else if (params.has('logout')) {
+            alertContainer.innerHTML = '<div class="alert alert-success">You have been logged out successfully.</div>';
+        } else if (params.has('success')) {
+            alertContainer.innerHTML = '<div class="alert alert-success">Registration successful! Please log in.</div>';
+        }
+    });
+</script>
+</body>
+</html>

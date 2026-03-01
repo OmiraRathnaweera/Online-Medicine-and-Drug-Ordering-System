@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Expiry Alerts</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div>
+            <h1>Expiry Alerts</h1>
+            <p class="subtitle">Manage products nearing their expiry date</p>
+        </div>
+        <a href="admin-dashboard.html" class="btn btn-primary"><i class="bi bi-arrow-left"></i> Back to Dashboard</a>
+    </div>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <table class="table table-hover">
+                <thead class="table-light">
+                <tr><th>Alert ID</th><th>Product ID</th><th>My message/th><th>Days Left</th><th>Generated At</th><th>Actions</th></tr>
+                </thead>
+                <tbody id="alertsTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        fetchAlerts();
+    });
+
+    function fetchAlerts() {
+        $.ajax({
+            url: '/api/alerts/pending',
+            method: 'GET',
+            success: function(alerts) {
+                const tableBody = $('#alertsTableBody');
+                tableBody.empty();
+                if (alerts.length === 0) {
+                    tableBody.html('<tr><td colspan="6" class="text-center">No pending alerts.</td></tr>');
+                    return;
+                }
+                alerts.forEach(alert => {
+                    const generatedDate = new Date(alert.alertGeneratedAt).toLocaleString();
+                    tableBody.append(`
+                        <tr>
+                            <td>${alert.id}</td>
+                            <td>${alert.productId}</td>
+                            <td>${alert.message}</td>
+                            <td><span class="badge bg-warning">${alert.daysUntilExpiry}</span></td>
+                            <td>${generatedDate}</td>
+                            <td>
+                                <button class="btn btn-sm btn-success" onclick="applyDiscount(${alert.id})">Discount</button>
+                                <button class="btn btn-sm btn-danger" onclick="removeStock(${alert.id})">Remove</button>
+                            </td>
+                        </tr>
+                    `);
+                });
+            }
+        });
+    }
+
+    function applyDiscount(alertId) {
+        const discountRate = prompt("Enter discount percentage (e.g., 20 for 20%):", "20");
+        if (discountRate === null || isNaN(discountRate) || discountRate <= 0) {
+            alert("Please enter a valid discount percentage.");
+            return;
+        }
+
+        $.ajax({
+            url: `/api/alerts/discount/${alertId}`,
+            method: 'PUT',
+            contentType: 'application/json',
+            data: JSON.stringify({ discountRate: parseFloat(discountRate) }),
+            success: function() {
+                alert('Discount applied successfully.');
+                fetchAlerts();
+            },
+            error: function() { alert('Failed to apply discount.'); }
+        });
+    }
+
+    function removeStock(alertId) {
+        if (!confirm('Are you sure you want to remove this item from stock? This action cannot be undone.')) {
+            return;
+        }
+        $.ajax({
+            url: `/api/alerts/remove/${alertId}`,
+            method: 'DELETE',
+            success: function() {
+                alert('Item removed from stock successfully.');
+                fetchAlerts();
+            },
+            error: function() { alert('Failed to remove item.'); }
+        });
+    }
+</script>
+</body>
+</html>
