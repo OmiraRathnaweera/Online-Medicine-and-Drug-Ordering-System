@@ -11,7 +11,7 @@ A web-based application designed to streamline the process of browsing, managing
 * **Order Processing:** Seamless checkout and order history tracking.
 
 ## 🛠️ Tech Stack
-* **Frontend:** (e.g., HTML, CSS, JavaScript / React)
+* **Frontend:** (e.g., HTML, CSS, JavaScript)
 * **Backend:** (e.g., Java Springboot)
 * **Database:** (e.g., MySQL)
 
